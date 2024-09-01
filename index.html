@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devil Advocate</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        .input-container {
+            margin-bottom: 20px;
+            width: 100%; /* Lebar maksimal 100% */
+            display: flex; /* Mengatur konten di dalamnya mengikuti */
+            justify-content: space-between; /* Memisahkan input dan tombol */
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 100%; /* Lebar input mengikuti kontainer */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        article {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            max-height: 300px; /* Batas tinggi untuk scrollbar */
+            overflow-y: auto; /* Menambahkan scrollbar */
+        }
+        #aiSummary {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-container">
+            <input type="text" id="newsLink" placeholder="Insert BBC news link">
+            <button id="fetchNews">Check</button>
+        </div>
+        <h1 id="newsTitle"></h1>
+        <article id="newsBody" class="centered" style="display: none;"></article> <!-- Menyembunyikan elemen -->
+        <h2 id="devilAdvocate" style="display: none;">Devil Advocate</h2> <!-- Menyembunyikan elemen -->
+        <p id="aiSummary" class="centered" style="display: none;"></p> <!-- Menyembunyikan elemen -->
+    </div>
+    <script>
+    document.getElementById('fetchNews').addEventListener('click', async () => {
+        document.getElementById('devilAdvocate').style.display = 'none'; // Menyembunyikan saat tombol ditekan
+        document.getElementById('newsBody').style.display = 'block'; // Menampilkan saat mengambil data
+        document.getElementById('newsBody').innerText = 'Reading the news...'; // Menampilkan teks saat mengambil data
+        const url = document.getElementById('newsLink').value;
+        console.log('Fetching news from:', url); 
+        const corsProxy = 'https://api.codetabs.com/v1/proxy?quest=';
+        try {
+            const response = await fetch(corsProxy + encodeURIComponent(url));
+            console.log('Response status:', response.status); 
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            const text = await response.text();
+            console.log('Fetched text:', text); 
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+
+            const title = doc.querySelector('h1'); // Selector untuk judul
+            const body = doc.querySelector('article'); // Selector untuk isi berita
+
+            if (title && body) {
+                document.getElementById('aiSummary').style.display = 'block'; // Menampilkan saat mendapatkan ringkasan
+                document.getElementById('devilAdvocate').style.display = 'block'; // Menampilkan setelah data diambil
+                document.getElementById('newsTitle').innerText = title.innerText;
+                document.getElementById('newsBody').innerText = body.innerText;
+                console.log('News title:', title.innerText); 
+                console.log('News body:', body.innerText); 
+                getAISummary(body.innerText);
+            } else {
+                console.error('Title or body not found in the fetched document.'); 
+            }
+        } catch (error) {
+            console.error('Error fetching news:', error); 
+            alert('Error fetching news'); 
+        }
+    });
+
+    async function getAISummary(newsContent) {
+        document.getElementById('aiSummary').innerText = 'Criticizing the news...'; // Menampilkan teks saat mengkritik data
+        const response = await fetch('/chat?' + encodeURIComponent(newsContent));
+        if (response.ok) {
+            const summary = await response.text();
+            document.getElementById('aiSummary').innerText = summary;
+        } else {
+            console.error('Error fetching AI summary:', response.statusText);
+            alert('Error fetching AI');
+        }
+    }
+
+    // Seleksi semua elemen yang mengandung teks **
+    document.addEventListener('DOMContentLoaded', function() {
+    const allElements = document.querySelectorAll('*');
+
+    allElements.forEach(element => {
+        if (element.nodeType === Node.TEXT_NODE) {
+        const textContent = element.textContent;
+        const boldRegex = /\*\*(.*?)\*\*/g;
+
+        let newHTML = textContent.replace(boldRegex, '<span class="bold">$1</span>');
+
+        // Hanya ubah innerHTML jika ada perubahan
+        if (newHTML !== textContent) {
+            element.parentNode.innerHTML = element.parentNode.innerHTML.replace(textContent, newHTML);
+        }
+        }
+    });
+    });
+    </script>
+</body>
+</html>
