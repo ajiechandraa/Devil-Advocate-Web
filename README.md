@@ -1,18 +1,3 @@
-# Nano Jarvis
-
-![Screenshot](nano-jarvis.png)
-
-Nano Jarvis is compatible with either a cloud-based (managed) LLM service (e.g. [OpenAI GPT model](https://platform.openai.com/docs), [Grog](https://groq.com), [OpenRouter](https://openrouter.ai), etc) or with a locally hosted LLM server (e.g. [llama.cpp](https://github.com/ggerganov/llama.cpp), [LocalAI](https://localai.io), [Ollama](https://ollama.com), etc). Please continue reading for detailed instructions.
-
-Requirement: [Node.js](https://nodejs.org) v18 or later.
-
-Launch with:
-
-```
-npm start
-```
-then open `localhost:3000` with your favorite web browser.
-
 ## Using Local LLM Servers
 
 Supported local LLM servers include [llama.cpp](https://github.com/ggerganov/llama.cpp), [Jan](https://jan.ai), [Ollama](https://ollama.com), and [LocalAI](https://localai.io).
@@ -34,12 +19,6 @@ export LLM_API_KEY="yourownapikey"
 export LLM_CHAT_MODEL="meta-llama/llama-3-8b-instruct"
 ```
 
-## Prompt Example
-
-- Can you speak Bahasa Indonesia?
-- When your training data cutoff?
-
-## References
 
 This project is fork of this original [nano-jarvis](https://github.com/ariya/nano-jarvis) project created by [Ariya Hidayat](https://github.com/ariya) and modified so it's suitable for this workshop.
 ![Screenshot](nano-jarvis.png)
